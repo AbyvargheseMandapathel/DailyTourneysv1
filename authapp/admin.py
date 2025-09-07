@@ -1,6 +1,28 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, OTP
 
-# Register your models here.
-admin.site.register(CustomUser)
+
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    model = CustomUser
+    list_display = ("email", "name", "role", "is_active", "is_staff")
+    list_filter = ("role", "is_active", "is_staff")
+    search_fields = ("email", "name")
+    ordering = ("email",)
+
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Personal info", {"fields": ("name", "organisation_name", "whatsapp_number", "org_insta_page", "whatsapp_channel")}),
+        ("Permissions", {"fields": ("role", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+    )
+
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("email", "name", "role", "password1", "password2", "is_staff", "is_superuser"),
+        }),
+    )
+
+
 admin.site.register(OTP)

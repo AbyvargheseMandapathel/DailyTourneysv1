@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "corsheaders",
     
     'authapp',
+    'games',
+    'tournaments'
 ]
 
 MIDDLEWARE = [
