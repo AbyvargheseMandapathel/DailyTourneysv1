@@ -33,7 +33,8 @@ echo "🏗️  Building and Starting Containers..."
 sudo docker compose down --remove-orphans || true
 
 # Build and start in detached mode
-sudo docker compose up -d --build
+sudo docker compose build --no-cache
+sudo docker compose up -d
 
 echo "✅ Deployment Complete!"
 echo "🌐 Application should be live at: http://$(curl -s ifconfig.me)"
