@@ -23,7 +23,7 @@ jobs:
             echo "🚀 Connecting to VPS..."
             
             # Navigate to project directory (Assuming it's in home dir)
-            cd ~/esportsdaily || exit 1
+            cd ~/DailyTourneysv1 || exit 1
             
             echo "📥 Drawing latest changes..."
             git pull origin main
