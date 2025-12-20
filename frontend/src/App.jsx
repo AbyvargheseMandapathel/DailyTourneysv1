@@ -8,6 +8,8 @@ import CreateTournament from './components/CreateTournament';
 import Login from './components/Login';
 import Signup from './components/Signup';
 
+import NotFound from './components/NotFound';
+
 // Basic wrapper to allow using Router hooks in Navigation
 import AddTeam from './components/AddTeam';
 import CreateMatch from './components/CreateMatch';
@@ -28,6 +30,7 @@ function AppContent() {
           <Route path="/dashboard/add-team" element={<AddTeam />} />
           <Route path="/dashboard/create-match" element={<CreateMatch />} />
           <Route path="/dashboard/submit-score" element={<SubmitScore />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>

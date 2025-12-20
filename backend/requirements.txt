@@ -5,3 +5,4 @@ channels>=4.0
 channels_redis
 daphne
 psycopg2-binary
+whitenoise
