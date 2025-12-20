@@ -1,0 +1,7 @@
+Django>=5.0
+djangorestframework
+django-cors-headers
+channels>=4.0
+channels_redis
+daphne
+psycopg2-binary

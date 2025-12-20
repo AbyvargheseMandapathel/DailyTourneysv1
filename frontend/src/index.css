@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+    --color-gaming-900: #0f1012;
+    --color-gaming-800: #1a1b1e;
+    --color-gaming-700: #2a2b30;
+    --color-gaming-accent: #F2A900;
+    --color-gaming-primary: #FFD700;
+    --color-gaming-secondary: #ffffff;
+    --color-gaming-success: #00ff9d;
+
+    --font-display: 'Orbitron', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+}
+
+@layer base {
+    body {
+        background-color: var(--color-gaming-900);
+        color: #f3f4f6;
+        font-family: var(--font-sans);
+        background-image:
+            radial-gradient(circle at 15% 50%, rgba(112, 0, 223, 0.08) 0%, transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(0, 247, 255, 0.08) 0%, transparent 25%);
+    }
+}
