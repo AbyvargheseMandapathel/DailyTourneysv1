@@ -14,8 +14,6 @@ services:
   redis:
     image: redis:7-alpine
     restart: always
-    ports:
-      - "6379:6379"
 
   backend:
     build: ./backend
@@ -24,8 +22,6 @@ services:
       - ./backend:/app
       - static_volume:/app/static
       - media_volume:/app/media
-    ports:
-      - "8000:8000"
     environment:
       - POSTGRES_DB=esports
       - POSTGRES_USER=postgres
@@ -40,7 +36,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "80:80"
+      - "8060:80"
     depends_on:
       - backend
 

@@ -1,0 +1,44 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "🚀 Connecting to VPS..."
+            
+            # Navigate to project directory (Assuming it's in home dir)
+            cd ~/esportsdaily || exit 1
+            
+            echo "📥 Drawing latest changes..."
+            git pull origin main
+            
+            echo "🐳 Rebuilding containers..."
+            # Stop verify if deploy.sh exists, otherwise run docker commands directly
+            if [ -f "deploy.sh" ]; then
+                chmod +x deploy.sh
+                ./deploy.sh
+            else
+                docker compose down --remove-orphans
+                docker compose up -d --build
+            fi
+            
+            echo "🧹 Pruning unused images..."
+            docker image prune -f
+            
+            echo "✅ Deployment Success!"
