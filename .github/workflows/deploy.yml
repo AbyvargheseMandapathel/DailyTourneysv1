@@ -29,7 +29,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
-            echo "🐳 Rebuilding containers..."
+            echo "� DEBUG: Checking frontend/Dockerfile content..."
+            cat frontend/Dockerfile
+            
+            echo "�🐳 Rebuilding containers..."
             # Stop verify if deploy.sh exists, otherwise run docker commands directly
             if [ -f "deploy.sh" ]; then
                 chmod +x deploy.sh

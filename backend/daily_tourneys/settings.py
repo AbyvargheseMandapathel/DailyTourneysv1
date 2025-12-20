@@ -26,8 +26,19 @@ SECRET_KEY = 'django-insecure-9wc8*bd$qip7$5v+0xev!t(8b1fo5b$hsf#^ch=o3i_&nm(hls
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'esportsdailyindia.com',
+    'www.esportsdailyindia.com',
+    '69.62.77.40',
+    'localhost',
+    '127.0.0.1'
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://esportsdailyindia.com',
+    'https://www.esportsdailyindia.com',
+    'http://69.62.77.40',
+]
 
 # Application definition
 
@@ -141,7 +152,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
