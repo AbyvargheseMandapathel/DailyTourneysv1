@@ -36,6 +36,9 @@ sudo docker compose down --remove-orphans || true
 sudo docker compose build --no-cache
 sudo docker compose up -d
 
+echo "🖌️  Collecting Static Files..."
+sudo docker compose exec backend python manage.py collectstatic --noinput
+
 echo "✅ Deployment Complete!"
 echo "🌐 Application should be live at: http://$(curl -s ifconfig.me)"
 echo "📝 Monitor logs with: sudo docker compose logs -f"

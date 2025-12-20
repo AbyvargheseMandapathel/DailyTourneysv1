@@ -37,6 +37,8 @@ services:
     build: ./frontend
     ports:
       - "8060:80"
+    volumes:
+      - static_volume:/app/static
     depends_on:
       - backend
 
