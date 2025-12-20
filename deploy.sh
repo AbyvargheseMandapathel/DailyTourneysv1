@@ -9,6 +9,11 @@ echo "🚀 Starting Deployment Script for EsportsDaily..."
 echo "📦 Updating system packages..."
 sudo apt-get update && sudo apt-get upgrade -y
 
+# 1.5 Configure Firewall (Allow Port 8060)
+echo "🛡️ Configuring Firewall..."
+sudo ufw allow 8060/tcp || echo "⚠️ Could not configure UFW, please check firewall manually."
+
+
 # 2. Install Docker & Docker Compose (if not installed)
 if ! command -v docker &> /dev/null
 then

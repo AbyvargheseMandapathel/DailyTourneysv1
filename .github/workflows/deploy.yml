@@ -26,7 +26,8 @@ jobs:
             cd ~/DailyTourneysv1 || exit 1
             
             echo "📥 Drawing latest changes..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             
             echo "🐳 Rebuilding containers..."
             # Stop verify if deploy.sh exists, otherwise run docker commands directly
