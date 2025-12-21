@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../api';
+import MatchWinnersCarousel from './MatchWinnersCarousel';
 
 const Leaderboard = () => {
     const { id } = useParams();
@@ -147,6 +148,8 @@ const Leaderboard = () => {
                     </div>
                 </div>
             </div>
+
+            <MatchWinnersCarousel matches={matches} />
 
             <div className="overflow-hidden bg-gaming-800/80 backdrop-blur-sm rounded-2xl border border-white/5 shadow-2xl">
                 <table className="w-full text-left border-collapse">

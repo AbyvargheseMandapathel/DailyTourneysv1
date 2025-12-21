@@ -66,10 +66,23 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class MatchSerializer(serializers.ModelSerializer):
     tournament_name = serializers.ReadOnlyField(source='tournament.name')
+    winner = serializers.SerializerMethodField()
     
     class Meta:
         model = Match
-        fields = ['id', 'tournament', 'tournament_name', 'match_number', 'map_name', 'created_at']
+        fields = ['id', 'tournament', 'tournament_name', 'match_number', 'map_name', 'created_at', 'winner']
+
+    def get_winner(self, obj):
+        # Find score with placement 1
+        winning_score = obj.scores.filter(placement=1).first()
+        if winning_score:
+            return {
+                "team_name": winning_score.team.name,
+                "team_logo": winning_score.team.logo.url if winning_score.team.logo else None,
+                "kills": winning_score.kills,
+                "total_points": winning_score.total_points
+            }
+        return None
 
 class ScoreSerializer(serializers.ModelSerializer):
     team_name = serializers.ReadOnlyField(source='team.name')
