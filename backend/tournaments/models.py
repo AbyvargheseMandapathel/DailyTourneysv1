@@ -8,6 +8,8 @@ class User(AbstractUser):
         PLAYER = 'PLAYER', 'Player'
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.PLAYER)
+    is_pro = models.BooleanField(default=False, help_text="Designates whether this user is a Pro Organiser (only configurable by Superuser).")
+    is_approved = models.BooleanField(default=False, help_text="Designates whether this organiser is approved.")
 
     def is_organiser(self):
         return self.role == self.Role.ORGANISER
@@ -61,15 +63,65 @@ class Score(models.Model):
         unique_together = ('match', 'team')
     
     def save(self, *args, **kwargs):
-        # Calculate points based on tournament config
-        config = self.match.tournament.points_config
-        # Simple logic: config might be {"placement": {"1": 10}, "kill": 1}
-        # Or just flat {"1": 10, "kill": 1}
-        # MVP: assume kills is 'kill' key, placement is string of rank
-        
-        place_pts = config.get(str(self.placement), 0)
-        self.total_points = kill_pts + place_pts
-        super().save(*args, **kwargs)
+        try:
+            # Calculate points based on tournament config
+            if not self.match or not self.match.tournament:
+                 print("Score Save Error: Match or Tournament not found")
+                 super().save(*args, **kwargs)
+                 return
+
+            config = self.match.tournament.points_config
+            # Ensure config is a dict
+            if not isinstance(config, dict):
+                 print(f"Score Save Warning: points_config is not a dict: {type(config)}")
+                 config = {}
+
+            # MVP: assume kills is 'kill' key (default 1), placement is string of rank
+            
+            kill_mult = config.get('kill', 1)
+            # Ensure it's int
+            try:
+                kill_mult = int(kill_mult)
+            except (ValueError, TypeError):
+                kill_mult = 1
+                
+            kill_pts = self.kills * kill_mult
+            
+            # Calculate placement points handling ranges like "7-8"
+            place_pts = 0
+            placement_str = str(self.placement)
+            
+            # Direct lookup first
+            if placement_str in config:
+                place_value = config[placement_str]
+            else:
+                # Check ranges
+                found_range_points = 0
+                for key, value in config.items():
+                    if '-' in key:
+                        try:
+                            start, end = map(int, key.split('-'))
+                            if start <= self.placement <= end:
+                                found_range_points = value
+                                break
+                        except ValueError:
+                            continue # Skip malformed keys
+                place_value = found_range_points
+
+            # Ensure it's int
+            try:
+                place_pts = int(place_value)
+            except (ValueError, TypeError):
+                place_pts = 0
+
+            self.total_points = kill_pts + place_pts
+            super().save(*args, **kwargs)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"CRITICAL ERROR IN SCORE.SAVE: {e}")
+            # Re-raise to alert DRF
+            raise e
 
 class FeaturedContent(models.Model):
     class ContentType(models.TextChoices):

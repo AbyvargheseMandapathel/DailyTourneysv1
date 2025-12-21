@@ -6,9 +6,22 @@ const FeaturedGrid = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     useEffect(() => {
-        api.get('featured/').then(res => {
-            setContent(res.data);
-        }).catch(err => console.error("Failed to fetch featured content", err));
+        api.get('featured/')
+            .then(res => {
+                if (Array.isArray(res.data)) {
+                    setContent(res.data);
+                } else if (res.data && Array.isArray(res.data.results)) {
+                    // Handle paginated response
+                    setContent(res.data.results);
+                } else {
+                    console.error("Unexpected API response for featured content:", res.data);
+                    setContent([]);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch featured content", err);
+                setContent([]);
+            });
     }, []);
 
     // Filter content by type

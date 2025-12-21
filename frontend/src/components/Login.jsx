@@ -11,9 +11,11 @@ const Login = () => {
         e.preventDefault();
         try {
             const res = await api.post('login/', { username, password });
+            console.log("Login Response Data:", res.data);
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('role', res.data.role);
             localStorage.setItem('user_id', res.data.user_id);
+            localStorage.setItem('is_approved', res.data.is_approved);
             window.dispatchEvent(new Event('auth-change'));
             alert('Login Successful');
             navigate('/dashboard');

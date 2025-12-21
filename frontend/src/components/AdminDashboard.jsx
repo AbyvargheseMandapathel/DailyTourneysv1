@@ -5,6 +5,52 @@ import api from '../api';
 const AdminDashboard = () => {
     // MVP: Simulate "Logged in as Admin" by having a super-powered UI
     // In real app, check context/auth
+    const [isApproved, setIsApproved] = useState(false);
+
+    useEffect(() => {
+        // Initial check from local storage for instant feedback
+        const storedApproved = localStorage.getItem('is_approved');
+        const role = localStorage.getItem('role');
+        const localApproved = (storedApproved === 'true') || (role === 'ADMIN');
+
+        console.log("Dashboard - Initial Local State:", localApproved);
+        setIsApproved(localApproved);
+
+        // Fetch latest status from API
+        api.get('user/profile/')
+            .then(res => {
+                const { is_approved, role } = res.data;
+                const freshApproved = is_approved || (role === 'ADMIN');
+
+                console.log("Dashboard - Fresh Profile:", res.data);
+                console.log("Dashboard - Fresh Approved State:", freshApproved);
+
+                // Update local storage to keep it in sync
+                localStorage.setItem('is_approved', is_approved);
+                localStorage.setItem('role', role); // In case role changed
+
+                setIsApproved(freshApproved);
+            })
+            .catch(err => {
+                console.error("Dashboard - Failed to fetch profile:", err);
+                // If API fails, we stick with local storage state
+            });
+    }, []);
+
+    if (!isApproved) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <div className="bg-red-900/20 border border-red-500/50 p-8 rounded-2xl max-w-lg">
+                    <h2 className="text-3xl font-display font-bold text-red-500 mb-4">Account Not Approved</h2>
+                    <p className="text-gray-300 text-lg mb-6">Your organiser account is pending approval.</p>
+                    <div className="bg-black/40 p-4 rounded-lg">
+                        <p className="text-sm text-gray-400 mb-1">Please contact support:</p>
+                        <p className="text-xl font-mono font-bold text-white selection:bg-red-500/30">+91 73062 55503</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="grid gap-8 max-w-7xl mx-auto">

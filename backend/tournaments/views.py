@@ -31,16 +31,22 @@ class TournamentViewSet(viewsets.ModelViewSet):
             total_kills = sum(s.kills for s in scores)
             total_wwcd = scores.filter(placement=1).count()
             
+            # Position points = Total Points - Kill Points
+            # Assuming logic from Score.save or just total - kills
+            total_position_points = total_points - total_kills
+            
             leaderboard.append({
                 "team_id": team.id,
                 "team_name": team.name,
                 "team_logo": team.logo.url if team.logo else None,
                 "total_points": total_points,
                 "total_kills": total_kills,
-                "total_wwcd": total_wwcd
+                "total_wwcd": total_wwcd,
+                "total_position_points": total_position_points
             })
         
-        leaderboard.sort(key=lambda x: x['total_points'], reverse=True)
+        # Sort by Total Points (desc), then WWCD (desc), then Position Points (desc)
+        leaderboard.sort(key=lambda x: (x['total_points'], x['total_wwcd'], x['total_position_points']), reverse=True)
         return Response(leaderboard)
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -105,6 +111,7 @@ class ScoreViewSet(viewsets.ModelViewSet):
 
     def trigger_update(self, score_instance):
         channel_layer = get_channel_layer()
+        tournament_id = score_instance.match.tournament.id
         async_to_sync(channel_layer.group_send)(
             f"tournament_{tournament_id}_leaderboard",
             {

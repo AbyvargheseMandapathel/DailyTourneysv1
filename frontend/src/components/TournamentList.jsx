@@ -8,7 +8,22 @@ const TournamentList = () => {
     const [tournaments, setTournaments] = useState([]);
 
     useEffect(() => {
-        api.get('tournaments/').then(res => setTournaments(res.data));
+        api.get('tournaments/')
+            .then(res => {
+                if (Array.isArray(res.data)) {
+                    setTournaments(res.data);
+                } else if (res.data && Array.isArray(res.data.results)) {
+                    // Handle paginated response
+                    setTournaments(res.data.results);
+                } else {
+                    console.error("Unexpected API response for tournaments:", res.data);
+                    setTournaments([]);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch tournaments", err);
+                setTournaments([]);
+            });
     }, []);
 
     return (

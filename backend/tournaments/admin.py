@@ -1,9 +1,20 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Tournament, Team, Match, Score
+from .models import User, Tournament, Team, Match, Score, FeaturedContent
 
 # Register custom User model
-admin.site.register(User, UserAdmin)
+class CustomUserAdmin(UserAdmin):
+    model = User
+    list_display = ['username', 'email', 'role', 'is_pro', 'is_approved', 'is_staff']
+    list_filter = ['role', 'is_pro', 'is_approved', 'is_staff', 'is_active']
+    fieldsets = UserAdmin.fieldsets + (
+        ('Esports Daily Info', {'fields': ('role', 'is_pro', 'is_approved')}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Esports Daily Info', {'fields': ('role', 'is_pro', 'is_approved')}),
+    )
+
+admin.site.register(User, CustomUserAdmin)
 
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
@@ -31,11 +42,9 @@ class ScoreAdmin(admin.ModelAdmin):
     list_filter = ('match__tournament', 'match')
     readonly_fields = ('total_points',)
 
-from .models import FeaturedContent
-
 @admin.register(FeaturedContent)
 class FeaturedContentAdmin(admin.ModelAdmin):
     list_display = ('title', 'content_type', 'priority', 'active')
-    list_list = ('content_type', 'active')
+    list_filter = ('content_type', 'active') # fixed typo list_list -> list_filter
     search_fields = ('title',)
     ordering = ('-priority',)

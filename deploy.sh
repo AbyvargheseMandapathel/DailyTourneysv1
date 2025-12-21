@@ -36,6 +36,10 @@ sudo docker compose down --remove-orphans || true
 sudo docker compose build --no-cache
 sudo docker compose up -d
 
+echo "🔄 Running Database Migrations..."
+sudo docker compose exec backend python manage.py makemigrations --noinput
+sudo docker compose exec backend python manage.py migrate --noinput
+
 echo "🖌️  Collecting Static Files..."
 sudo docker compose exec backend python manage.py collectstatic --noinput
 

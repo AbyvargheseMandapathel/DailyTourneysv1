@@ -37,20 +37,41 @@ const SubmitScore = () => {
         return () => clearInterval(interval);
     }, [selectedScoreTournament]);
 
-    const submitScore = async (e) => {
-        e.preventDefault();
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [conflictError, setConflictError] = useState(null); // Store conflict details for force update action
+
+    const submitScore = async (e, forceUpdate = false) => {
+        if (e) e.preventDefault();
+        setErrorMessage(null);
+        setConflictError(null);
+
         try {
             await api.post('scores/', {
                 match: selectedMatch,
                 team: selectedTeam,
                 kills: parseInt(kills),
-                placement: parseInt(placement)
+                placement: parseInt(placement),
+                force_update: forceUpdate
             });
             alert('Score added!');
+            setErrorMessage(null);
+            setConflictError(null);
             fetchLeaderboard(); // Update standings immediately
         } catch (err) {
-            alert('Error adding score. Check console or permissions.');
             console.error(err);
+            if (err.response && err.response.data) {
+                const data = err.response.data;
+                // Check for placement conflict
+                if (data.placement && Array.isArray(data.placement) && data.placement.some(msg => msg.includes("already taken"))) {
+                    setErrorMessage(data.placement[0]);
+                    setConflictError(true);
+                } else {
+                    // Generic error display
+                    setErrorMessage(JSON.stringify(data));
+                }
+            } else {
+                setErrorMessage('Error adding score. Check console.');
+            }
         }
     };
 
@@ -70,6 +91,29 @@ const SubmitScore = () => {
                     <h2 className="text-xl font-display font-bold text-white mb-6 uppercase tracking-wider">Score Entry</h2>
 
                     <form onSubmit={submitScore} className="space-y-6 relative z-10">
+                        {errorMessage && (
+                            <div className="bg-red-500/10 border border-red-500/50 p-4 rounded-xl">
+                                <p className="text-red-400 text-sm font-bold flex items-center">
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    {errorMessage}
+                                </p>
+                                {conflictError && (
+                                    <div className="mt-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => submitScore(null, true)}
+                                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest shadow-lg transition-all"
+                                        >
+                                            Delete Conflicting Score & Update
+                                        </button>
+                                        <p className="text-[10px] text-gray-400 mt-2">
+                                            Clicking this will <span className="text-white font-bold">DELETE</span> the team currently holding this rank and save your new entry.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <label className="text-xs uppercase font-bold text-gray-400 tracking-wider">Tournament</label>
