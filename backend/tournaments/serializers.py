@@ -1,10 +1,40 @@
 from rest_framework import serializers
-from .models import User, Tournament, Team, Match, Score, FeaturedContent
+from .models import User, Tournament, Team, Match, Score, FeaturedContent, TournamentTheme
 
 class FeaturedContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeaturedContent
         fields = '__all__'
+
+class TournamentThemeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TournamentTheme
+        fields = ['id', 'name', 'theme_image', 'custom_font', 'layout_config', 'teams_per_page', 'tournament', 'created_at']
+        read_only_fields = ['created_at']
+
+    def to_internal_value(self, data):
+        # Handle layout_config sent as JSON string in FormData
+        print(f"DEBUG: to_internal_value received raw data: {data}")
+        if 'layout_config' in data:
+             print(f"DEBUG: layout_config type: {type(data['layout_config'])}")
+             print(f"DEBUG: layout_config value: {data['layout_config']}")
+
+        if 'layout_config' in data and isinstance(data['layout_config'], str):
+            import json
+            try:
+                # Handle QueryDict immutability for Multipart
+                if hasattr(data, 'dict'):
+                    data = data.dict()
+                else:
+                    data = data.copy()
+                
+                data['layout_config'] = json.loads(data['layout_config'])
+                print(f"DEBUG: Parsed layout_config: {data['layout_config']}")
+                return super().to_internal_value(data)
+            except json.JSONDecodeError as e:
+                print(f"DEBUG: JSONDecodeError: {e}")
+                pass # Let standard validation handle error
+        return super().to_internal_value(data)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,10 +44,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TournamentSerializer(serializers.ModelSerializer):
     creator_username = serializers.SerializerMethodField()
+    themes = TournamentThemeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tournament
-        fields = ['id', 'name', 'creator', 'creator_username', 'created_at', 'points_config', 'status', 'description', 'logo', 'cover_image']
+        fields = ['id', 'name', 'creator', 'creator_username', 'created_at', 'points_config', 'status', 'description', 'logo', 'cover_image', 'theme_image', 'layout_config', 'themes']
         read_only_fields = ['creator', 'created_at']
 
     def get_creator_username(self, obj):
@@ -77,3 +108,8 @@ class ScoreSerializer(serializers.ModelSerializer):
                     })
         
         return data
+
+    def create(self, validated_data):
+        # Remove 'force_update' from validated_data because it's not a model field
+        validated_data.pop('force_update', None)
+        return super().create(validated_data)

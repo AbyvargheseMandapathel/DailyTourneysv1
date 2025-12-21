@@ -27,6 +27,10 @@ class Tournament(models.Model):
     description = models.TextField(blank=True, default='')
     logo = models.ImageField(upload_to='tournament_logos/', blank=True, null=True)
     cover_image = models.ImageField(upload_to='tournament_covers/', blank=True, null=True)
+    
+    # Leaderboard Image Generation Config
+    theme_image = models.ImageField(upload_to='tournament_themes/', blank=True, null=True)
+    layout_config = models.JSONField(default=dict, blank=True, help_text="Config for image generation: start_x, start_y, row_height, font_size, etc.")
 
     def __str__(self):
         return self.name
@@ -70,7 +74,7 @@ class Score(models.Model):
                  super().save(*args, **kwargs)
                  return
 
-            config = self.match.tournament.points_config
+            config = self.match.tournament.points_config or {}
             # Ensure config is a dict
             if not isinstance(config, dict):
                  print(f"Score Save Warning: points_config is not a dict: {type(config)}")
@@ -139,3 +143,15 @@ class FeaturedContent(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.content_type})"
+
+class TournamentTheme(models.Model):
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='themes')
+    name = models.CharField(max_length=100, default="Default Theme")
+    theme_image = models.ImageField(upload_to='tournament_themes/')
+    custom_font = models.FileField(upload_to='tournament_fonts/', blank=True, null=True, help_text="Upload .ttf or .otf font file")
+    layout_config = models.JSONField(default=dict, blank=True)
+    teams_per_page = models.IntegerField(default=20, help_text="Number of teams to show per image page")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tournament.name} - {self.name}"

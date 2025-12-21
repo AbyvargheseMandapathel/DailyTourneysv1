@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
+import ThemeEditor from './ThemeEditor';
 
 const AdminDashboard = () => {
     // MVP: Simulate "Logged in as Admin" by having a super-powered UI
     // In real app, check context/auth
     const [isApproved, setIsApproved] = useState(false);
+    const [tournaments, setTournaments] = useState([]);
+    const [showThemeEditor, setShowThemeEditor] = useState(null);
 
     useEffect(() => {
         // Initial check from local storage for instant feedback
@@ -30,6 +33,10 @@ const AdminDashboard = () => {
                 localStorage.setItem('role', role); // In case role changed
 
                 setIsApproved(freshApproved);
+
+                if (freshApproved) {
+                    api.get('tournaments/').then(res => setTournaments(res.data));
+                }
             })
             .catch(err => {
                 console.error("Dashboard - Failed to fetch profile:", err);
@@ -100,6 +107,133 @@ const AdminDashboard = () => {
                     <p className="text-gray-400 text-xs">Update match results.</p>
                 </Link>
             </div>
+            {/* Active Tournaments Section */}
+            <div>
+                <h2 className="text-2xl font-display font-bold text-white mb-6 uppercase tracking-wider border-l-4 border-white pl-4">
+                    Your Competitions
+                </h2>
+                <div className="space-y-4">
+                    {tournaments.length === 0 ? (
+                        <p className="text-gray-500 font-mono">No tournaments found.</p>
+                    ) : (
+                        tournaments.map(t => (
+                            <div key={t.id} className="bg-gaming-800 p-6 rounded-xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 bg-black rounded-lg overflow-hidden border border-white/10">
+                                        {t.logo ? (
+                                            <img src={t.logo} alt={t.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold">LOG</div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">{t.name}</h3>
+                                        <div className="flex items-center space-x-2 mt-1">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'}`}>
+                                                {t.status}
+                                            </span>
+                                            <span className="text-gray-500 text-xs font-mono">ID: {t.id}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                    <button
+                                        onClick={() => setShowThemeEditor(t.id)}
+                                        className="px-4 py-2 bg-gaming-900 hover:bg-white hover:text-black border border-white/10 rounded-lg text-sm font-bold uppercase transition-all"
+                                    >
+                                        Layout & Theme
+                                    </button>
+                                    <a
+                                        href={`${import.meta.env.VITE_API_URL}tournaments/${t.id}/generate_image/`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-4 py-2 bg-gaming-accent text-black rounded-lg text-sm font-bold uppercase hover:brightness-110 transition-all shadow-lg flex items-center"
+                                    >
+                                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        Download Image
+                                    </a>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Theme Editor Modal */}
+            {showThemeEditor && (
+                <ThemeEditor
+                    tournamentId={showThemeEditor}
+                    onClose={() => setShowThemeEditor(null)}
+                />
+            )}
+            {/* Active Tournaments Section */}
+            <div>
+                <h2 className="text-2xl font-display font-bold text-white mb-6 uppercase tracking-wider border-l-4 border-white pl-4">
+                    Your Competitions
+                </h2>
+                <div className="space-y-4">
+                    {tournaments.length === 0 ? (
+                        <p className="text-gray-500 font-mono">No tournaments found.</p>
+                    ) : (
+                        tournaments.map(t => (
+                            <div key={t.id} className="bg-gaming-800 p-6 rounded-xl border border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 bg-black rounded-lg overflow-hidden border border-white/10">
+                                        {t.logo ? (
+                                            <img src={t.logo} alt={t.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-700 font-bold">LOG</div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">{t.name}</h3>
+                                        <div className="flex items-center space-x-2 mt-1">
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.status === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'}`}>
+                                                {t.status}
+                                            </span>
+                                            <span className="text-gray-500 text-xs font-mono">ID: {t.id}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-3">
+                                    <button
+                                        onClick={() => setShowThemeEditor(t.id)}
+                                        className="px-4 py-2 bg-gaming-900 hover:bg-white hover:text-black border border-white/10 rounded-lg text-sm font-bold uppercase transition-all"
+                                    >
+                                        Layout & Theme
+                                    </button>
+                                    <a
+                                        href={`${import.meta.env.VITE_API_URL}tournaments/${t.id}/generate_zip/`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-4 py-2 bg-gaming-800 text-white border border-white/20 rounded-lg text-sm font-bold uppercase hover:bg-white hover:text-black transition-all shadow-lg flex items-center"
+                                    >
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        ZIP
+                                    </a>
+                                    <a
+                                        href={`${import.meta.env.VITE_API_URL}tournaments/${t.id}/generate_image/`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-4 py-2 bg-gaming-accent text-black rounded-lg text-sm font-bold uppercase hover:brightness-110 transition-all shadow-lg flex items-center"
+                                    >
+                                        <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        Download Image
+                                    </a>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </div>
+
+            {/* Theme Editor Modal */}
+            {showThemeEditor && (
+                <ThemeEditor
+                    tournamentId={showThemeEditor}
+                    onClose={() => setShowThemeEditor(null)}
+                />
+            )}
         </div>
     );
 };

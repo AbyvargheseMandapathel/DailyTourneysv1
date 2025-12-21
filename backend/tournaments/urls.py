@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TournamentViewSet, TeamViewSet, MatchViewSet, ScoreViewSet, FeaturedContentViewSet
+from .views import TournamentViewSet, TeamViewSet, MatchViewSet, ScoreViewSet, FeaturedContentViewSet, TournamentThemeViewSet
 from .auth_views import RegisterView, CustomAuthToken, SetProStatusView, UserProfileView
 
 router = DefaultRouter()
 router.register(r'tournaments', TournamentViewSet)
+router.register(r'tournament_themes', TournamentThemeViewSet)
 router.register(r'teams', TeamViewSet)
 router.register(r'matches', MatchViewSet)
 router.register(r'scores', ScoreViewSet)

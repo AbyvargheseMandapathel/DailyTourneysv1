@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Tournament, Team, Match, Score, FeaturedContent
+from .models import User, Tournament, Team, Match, Score, FeaturedContent, TournamentTheme
+import json
+from django.http import HttpResponse
 
 # Register custom User model
 class CustomUserAdmin(UserAdmin):
@@ -15,6 +17,22 @@ class CustomUserAdmin(UserAdmin):
     )
 
 admin.site.register(User, CustomUserAdmin)
+
+@admin.action(description='Export Layout Config')
+def export_layout_config(modeladmin, request, queryset):
+    # Exports the layout_config of selected themes as JSON
+    data = {}
+    for theme in queryset:
+        data[f"{theme.tournament.name} - {theme.name}"] = theme.layout_config
+    
+    response = HttpResponse(json.dumps(data, indent=2), content_type='application/json')
+    response['Content-Disposition'] = 'attachment; filename="layout_configs.json"'
+    return response
+
+@admin.register(TournamentTheme)
+class TournamentThemeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'tournament', 'teams_per_page', 'created_at')
+    actions = [export_layout_config]
 
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):

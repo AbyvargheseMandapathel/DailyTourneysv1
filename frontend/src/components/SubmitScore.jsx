@@ -32,8 +32,8 @@ const SubmitScore = () => {
     useEffect(() => {
         fetchLeaderboard();
         // Set up an interval or just rely on manual refresh/submit trigger
-        // For "live" feel, we could poll every 10s
-        const interval = setInterval(fetchLeaderboard, 10000);
+        // For "live" feel, we could poll every 3s
+        const interval = setInterval(fetchLeaderboard, 3000);
         return () => clearInterval(interval);
     }, [selectedScoreTournament]);
 
@@ -247,6 +247,31 @@ const SubmitScore = () => {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {/* Download Actions */}
+                    {selectedScoreTournament && (
+                        <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 gap-4">
+                            <a
+                                href={`${import.meta.env.VITE_API_URL}tournaments/${selectedScoreTournament}/generate_image/`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="px-4 py-3 bg-gaming-900 border border-white/10 hover:border-gaming-primary rounded-xl flex items-center justify-center text-xs font-bold uppercase text-gray-300 hover:text-white transition-all"
+                            >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Overall Image
+                            </a>
+                            <a
+                                href={selectedMatch ? `${import.meta.env.VITE_API_URL}tournaments/${selectedScoreTournament}/generate_image/?match_id=${selectedMatch}` : '#'}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`px-4 py-3 border border-white/10 rounded-xl flex items-center justify-center text-xs font-bold uppercase transition-all ${selectedMatch ? 'bg-gaming-900 hover:border-gaming-success text-gray-300 hover:text-white' : 'bg-black/20 text-gray-700 cursor-not-allowed'}`}
+                                onClick={e => !selectedMatch && e.preventDefault()}
+                            >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                Match Image
+                            </a>
                         </div>
                     )}
                 </div>
