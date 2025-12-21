@@ -123,6 +123,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         if not page_data and page > 1:
              return Response({"error": "Page out of range"}, status=400)
 
+        try:
             # Generate Image using Helper
             from PIL import Image, ImageDraw, ImageFont, ImageOps
             import io
@@ -130,7 +131,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
             image_buffer = self.create_leaderboard_image(
                 tournament, 
                 theme, 
-                page_data, 
+                page_data,
                 start_index
             )
             
@@ -159,20 +160,20 @@ class TournamentViewSet(viewsets.ModelViewSet):
                     'team_name': score.team.name,
                     'team_logo': score.team.logo,
                     'matches': 0,
-                    'total_kills': 0,
-                    'total_position_points': 0,
-                    'total_wwcd': 0,
-                    'total_points': 0
+                    'fin_pts': 0,
+                    'pos_pts': 0,
+                    'wwcd': 0,
+                    'total': 0
                 }
             
             teams[tid]['matches'] += 1
-            teams[tid]['total_kills'] += score.kills
-            teams[tid]['total_position_points'] += (score.total_points - score.kills)
+            teams[tid]['fin_pts'] += score.kills
+            teams[tid]['pos_pts'] += (score.total_points - score.kills)
             if score.placement == 1:
-                teams[tid]['total_wwcd'] += 1
-            teams[tid]['total_points'] += score.total_points
+                teams[tid]['wwcd'] += 1
+            teams[tid]['total'] += score.total_points
             
-        leaderboard_data = sorted(teams.values(), key=lambda x: x['total_points'], reverse=True)
+        leaderboard_data = sorted(teams.values(), key=lambda x: x['total'], reverse=True)
         
         # Resolve Theme
         theme_id = request.query_params.get('theme_id')
