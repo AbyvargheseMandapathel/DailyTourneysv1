@@ -149,17 +149,38 @@ const Leaderboard = () => {
                 </div>
             </div>
 
+            {/* Banner Section */}
+            <div className="bg-gradient-to-r from-green-900 to-gaming-900 border border-green-500/30 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg animate-fade-in-up">
+                <div className="flex items-center space-x-3">
+                    <span className="text-2xl">📢</span>
+                    <div>
+                        <h3 className="text-green-400 font-bold uppercase tracking-wider text-sm">Join the Community</h3>
+                        <p className="text-gray-300 text-xs md:text-sm">For more Tournament updates, join our WhatsApp channel.</p>
+                    </div>
+                </div>
+                <a
+                    href="https://whatsapp.com/channel/0029Vb7DEbLDjiOb19VApP3K"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg text-sm uppercase tracking-wider transition-all transform hover:scale-105 shadow-green-900/50 shadow-lg"
+                >
+                    Join Now
+                </a>
+            </div>
+
             <MatchWinnersCarousel matches={matches} />
 
             <div className="overflow-hidden bg-gaming-800/80 backdrop-blur-sm rounded-2xl border border-white/5 shadow-2xl">
+                {/* Removed overflow-x-auto and min-w to force fit */}
                 <table className="w-full text-left border-collapse">
-                    <thead className="bg-gradient-to-r from-gaming-900 to-gaming-800 text-gray-400 font-display text-xs uppercase tracking-widest border-b border-white/5">
+                    <thead className="bg-gradient-to-r from-gaming-900 to-gaming-800 text-gray-400 font-display text-[10px] md:text-xs uppercase tracking-widest border-b border-white/5">
                         <tr>
-                            <th className="p-5 w-24 text-center">Rank</th>
-                            <th className="p-5">Team</th>
-                            <th className="p-5 text-center">WWCD</th>
-                            <th className="p-5 text-center">Kills</th>
-                            <th className="p-5 text-right text-gaming-accent">Total Points</th>
+                            <th className="p-2 md:p-5 w-8 md:w-24 text-center">Rank</th>
+                            <th className="p-2 md:p-5">Team</th>
+                            <th className="p-2 md:p-5 text-center">WWCD</th>
+                            <th className="p-2 md:p-5 text-center">Pos Pts</th> {/* New Column */}
+                            <th className="p-2 md:p-5 text-center">Kills</th>
+                            <th className="p-2 md:p-5 text-right text-gaming-accent">Total</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -176,44 +197,47 @@ const Leaderboard = () => {
 
                             return (
                                 <tr key={team.team_id} className={`transition-colors duration-200 ${rowBg}`}>
-                                    <td className="p-5 text-center">
-                                        <div className={`font-display font-black text-2xl ${rankColor}`}>#{index + 1}</div>
+                                    <td className="p-2 md:p-5 text-center">
+                                        <div className={`font-display font-black text-sm md:text-2xl ${rankColor}`}>#{index + 1}</div>
                                     </td>
-                                    <td className="p-5">
-                                        <div className="flex items-center space-x-4">
+                                    <td className="p-2 md:p-5">
+                                        <div className="flex items-center space-x-2 md:space-x-4">
                                             {/* 2) Team Logo with Fallback */}
-                                            <div className="w-12 h-12 flex-shrink-0 bg-gaming-900 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center">
+                                            <div className="w-8 h-8 md:w-12 md:h-12 flex-shrink-0 bg-gaming-900 rounded-lg overflow-hidden border border-white/10 flex items-center justify-center">
                                                 {team.team_logo ? (
                                                     <img src={team.team_logo} alt={team.team_name} className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <span className="font-display font-bold text-gaming-accent text-sm tracking-wider">
+                                                    <span className="font-display font-bold text-gaming-accent text-[10px] md:text-sm tracking-wider">
                                                         {getInitials(team.team_name)}
                                                     </span>
                                                 )}
                                             </div>
                                             <div>
-                                                <div className="font-bold text-white text-lg leading-tight">{team.team_name}</div>
-                                                {index === 0 && <span className="text-[10px] text-yellow-500 font-bold uppercase tracking-widest">Current Leader</span>}
+                                                <div className="font-bold text-white text-xs md:text-lg leading-tight break-all md:break-normal line-clamp-1">{team.team_name}</div>
+                                                {index === 0 && <span className="hidden md:inline-block text-[10px] text-yellow-500 font-bold uppercase tracking-widest">Current Leader</span>}
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-5 text-center">
-                                        <div className="flex items-center justify-center space-x-1">
-                                            <span className="text-xl">🍗</span>
-                                            <span className="font-mono text-white font-bold text-lg">{team.total_wwcd || 0}</span>
+                                    <td className="p-1 md:p-5 text-center">
+                                        <div className="flex items-center justify-center space-x-0.5 md:space-x-1">
+                                            <span className="text-xs md:text-xl">🍗</span>
+                                            <span className="font-mono text-white font-bold text-xs md:text-lg">{team.total_wwcd || 0}</span>
                                         </div>
                                     </td>
-                                    <td className="p-5 text-center font-mono text-gray-300 font-bold text-lg">{team.total_kills}</td>
-                                    <td className="p-5 text-right font-display font-black text-2xl text-white drop-shadow-md">
+                                    <td className="p-1 md:p-5 text-center font-mono text-gray-300 font-bold text-xs md:text-lg">
+                                        {team.total_position_points || 0}
+                                    </td>
+                                    <td className="p-1 md:p-5 text-center font-mono text-gray-300 font-bold text-xs md:text-lg">{team.total_kills}</td>
+                                    <td className="p-2 md:p-5 text-right font-display font-black text-sm md:text-2xl text-white drop-shadow-md">
                                         {team.total_points}
-                                        <span className="text-xs text-gray-500 font-sans font-normal ml-1">PTS</span>
+                                        <span className="hidden md:inline text-xs text-gray-500 font-sans font-normal ml-1">PTS</span>
                                     </td>
                                 </tr>
                             );
                         })}
                         {leaderboard.length === 0 && (
                             <tr>
-                                <td colSpan="4" className="p-12 text-center text-gray-500 font-display">
+                                <td colSpan="6" className="p-8 md:p-12 text-center text-gray-500 font-display text-sm md:text-base">
                                     NO DATA AVAILABLE
                                 </td>
                             </tr>

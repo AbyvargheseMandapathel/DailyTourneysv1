@@ -17,9 +17,12 @@ class RegisterView(views.APIView):
         if User.objects.filter(username=username).exists():
             return Response({'error': 'Username exists'}, status=400)
         
-        user = User.objects.create_user(username=username, password=password, role=role, is_approved=False)
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key, 'user_id': user.id, 'role': user.role, 'is_pro': user.is_pro, 'is_approved': user.is_approved})
+        try:
+            user = User.objects.create_user(username=username, password=password, role=role, is_approved=False)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key, 'user_id': user.id, 'role': user.role, 'is_pro': user.is_pro, 'is_approved': user.is_approved})
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):

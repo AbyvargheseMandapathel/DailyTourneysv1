@@ -20,7 +20,8 @@ const Signup = () => {
             navigate('/dashboard'); // Go to dashboard, which will show approval message
         } catch (err) {
             console.error(err);
-            alert('Registration Failed (Username taken?)');
+            const errorMessage = err.response?.data?.error || 'Registration Failed';
+            alert(errorMessage);
         }
     };
 
