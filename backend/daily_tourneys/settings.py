@@ -40,6 +40,13 @@ CSRF_TRUSTED_ORIGINS = [
     'http://69.62.77.40',
 ]
 
+# Security: Trust X-Forwarded-Proto from Nginx for HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Upload Limits
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600
+
 # Application definition
 
 
