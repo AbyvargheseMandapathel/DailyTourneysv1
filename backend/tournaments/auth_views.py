@@ -8,6 +8,7 @@ from .serializers import UserSerializer
 
 class RegisterView(views.APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = [] # Disable CSRF check coming from SessionAuth
 
     def post(self, request):
         username = request.data.get('username')

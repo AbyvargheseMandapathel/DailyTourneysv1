@@ -34,7 +34,7 @@ const Login = () => {
                 <button className="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded font-bold">Login</button>
             </form>
             <p className="mt-4 text-center text-gray-400 text-sm">
-                Don't have an account? <Link to="/register" className="text-purple-400 hover:underline">Sign up</Link>
+                Don't have an account?? <Link to="/register" className="text-purple-400 hover:underline">Sign up</Link>
             </p>
         </div>
     );
